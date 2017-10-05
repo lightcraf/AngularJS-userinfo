@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Users</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <style>
+        .submitted .ng-invalid {
+            border: 1px solid red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+        }
+
+        .hide-error-message {
+            display: none;
+        }
+
+        .table-header {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body data-ng-app="userApp" data-ng-controller="userCtrl">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Users' information</h1>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="table-header" data-ng-click="sortBy('name'); toggleIcons('name')">
+                                    Name
+                                    <span class="glyphicon glyphicon-sort" data-ng-class="{'glyphicon-sort-by-alphabet': sortNameAZ, 'glyphicon-sort-by-alphabet-alt': sortNameZA}"></span>
+                                </th>
+                                <th class="table-header" data-ng-click="sortBy('username'); toggleIcons('username')">
+                                    Username
+                                    <span class="glyphicon glyphicon-sort" data-ng-class="{'glyphicon-sort-by-alphabet': sortUserNameAZ, 'glyphicon-sort-by-alphabet-alt': sortUserNameZA}"></span>
+                                </th>
+                                <th class="table-header" data-ng-click="sortBy('email'); toggleIcons('email')">
+                                    Email
+                                    <span class="glyphicon glyphicon-sort" data-ng-class="{'glyphicon-sort-by-alphabet': sortEmailAZ, 'glyphicon-sort-by-alphabet-alt': sortEmailZA}"></span>
+                                </th>
+                                <th class="table-header" data-ng-click="sortBy('address.street'); toggleIcons('address.street')">
+                                    Street
+                                    <span class="glyphicon glyphicon-sort" data-ng-class="{'glyphicon-sort-by-alphabet': sortAddressAZ, 'glyphicon-sort-by-alphabet-alt': sortAddressZA}"></span>
+                                </th>
+                                <th class="table-header" data-ng-click="sortBy('company.name'); toggleIcons('company.name')">
+                                    Company
+                                    <span class="glyphicon glyphicon-sort" data-ng-class="{'glyphicon-sort-by-alphabet': sortCompanyAZ, 'glyphicon-sort-by-alphabet-alt': sortCompanyZA}"></span>
+                                </th>
+                                <th>Distance</th>
+                            </tr>
+                        </thead>
+                        <tr data-ng-repeat="x in userData | filter:search | orderBy:defaultSortName:reverse">
+                            <td>{{x.name}}</td>
+                            <td>{{x.username}}</td>
+                            <td>{{x.email}}</td>
+                            <td>{{x.address.street}}</td>
+                            <td>{{x.company.name}}</td>
+                            <td>{{x.distance}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <form>
+                    <div class="form-group">
+                        <label for="name-search">Search by name:</label>
+                        <input type="text" class="form-control" id="name-search" data-ng-model="search.name">
+                    </div>
+                    <div class="form-group">
+                        <label for="username-search">Search by username:</label>
+                        <input type="text" class="form-control" id="username-search" data-ng-model="search.username">
+                    </div>
+                    <div class="form-group">
+                        <label for="email-search">Search by email:</label>
+                        <input type="text" class="form-control" id="email-search" data-ng-model="search.email">
+                    </div>
+                </form>
+
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalBox">Add user info</button>
+            </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalBox" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add user</h4>
+                </div>
+                <div class="modal-body">
+                    <form data-ng-class="{'submitted': submitted}" data-ng-submit="addNewUser(itemToAdd)">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control input-sm" id="name" name="user-name" data-ng-model="itemToAdd.name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="username">User name:</label>
+                            <input type="text" class="form-control input-sm" id="username" data-ng-model="itemToAdd.username" required>
+                            <p data-ng-class="userNameError ? 'error-message' : 'hide-error-message'">This user name isn't allowed. Try again.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control input-sm" id="email" data-ng-model="itemToAdd.email" required>
+                            <p data-ng-class="emailError ? 'error-message' : 'hide-error-message'">This email isn't allowed. Try again.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="street">Street:</label>
+                            <input type="text" class="form-control input-sm" id="street" data-ng-model="itemToAdd.address.street">
+                        </div>
+                        <div class="form-group">
+                            <label for="suite">Suite:</label>
+                            <input type="text" class="form-control input-sm" id="suite" data-ng-model="itemToAdd.address.suite">
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City:</label>
+                            <input type="text" class="form-control input-sm" id="city" data-ng-model="itemToAdd.address.city">
+                        </div>
+                        <div class="form-group">
+                            <label for="zipecode">Zipecode:</label>
+                            <input type="text" class="form-control input-sm" id="zipecode" data-ng-model="itemToAdd.address.zipecode">
+                        </div>
+                        <div class="form-group">
+                            <label for="lat">Latitude:</label>
+                            <input type="text" class="form-control input-sm" id="lat" data-ng-model="itemToAdd.address.geo.lat">
+                            <p data-ng-class="addressErrorGeoLat ? 'error-message' : 'hide-error-message'">Incorrect number.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="lng">Longitude:</label>
+                            <input type="text" class="form-control input-sm" id="lng" data-ng-model="itemToAdd.address.geo.lng">
+                            <p data-ng-class="addressErrorGeoLng ? 'error-message' : 'hide-error-message'">Incorrect number.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone:</label>
+                            <input type="tel" class="form-control input-sm" id="phone" data-ng-model="itemToAdd.phone" data-ng-keyup="phoneNumber($event)">
+                            <p data-ng-class="phoneNumberError ? 'error-message' : 'hide-error-message'">Incorrect phone number.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="website">Website:</label>
+                            <input type="text" class="form-control input-sm" id="website" placeholder="website_name.domain" data-ng-model="itemToAdd.website">
+                        </div>
+                        <div class="form-group">
+                            <label for="comp-name">Company name:</label>
+                            <input type="text" class="form-control input-sm" id="comp-name" data-ng-model="itemToAdd.company.name" required>
+                            <p data-ng-class="compNameError ? 'error-message' : 'hide-error-message'">This company name isn't allowed. Try again.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="catch">Catch phrase:</label>
+                            <input type="text" class="form-control input-sm" id="catch" data-ng-model="itemToAdd.company.catchPhrase">
+                        </div>
+                        <div class="form-group">
+                            <label for="bs">bs:</label>
+                            <input type="text" class="form-control input-sm" id="bs" data-ng-model="itemToAdd.company.bs">
+                        </div>
+                        <button type="submit" class="btn btn-success" data-ng-click="submitted = true;">Submit</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
