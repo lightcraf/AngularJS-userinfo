@@ -1,5 +1,7 @@
 # AngularJS-userinfo
 
+https://lightcraf.github.io/AngularJS-userinfo/
+
 Задача: реализовать приложение для вывода списка существующих пользователей и добавления новых.
 
 Средства разработки: AngularJS 1.5, Bootstrap (необязательно).
